@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Vue app</title>
   <link rel="stylesheet" type="text/css" href="style.css"/>
 </head>
@@ -8,8 +9,11 @@
 <body>
 <div class="nav-bar"></div>
 <div id="app">
+  <div class="cart">
+    <p>Cart({{ cart.length }})</p>
+  </div>
+  <product :premium="premium" @remove-from-cart="updateCart" @add-to-cart="AddItemToCartInstanse"></product>
 
-  
 </div>
 
 <script src="https://unpkg.com/vue"></script>
