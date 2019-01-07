@@ -8,8 +8,86 @@ Vue.component('product-details', {
   template: `
   <ul>
     <li v-for="detail  in details">{{ detail }}</li>
-  </ul>
-  `
+  </ul>  `
+})
+
+Vue.component('product-review', {
+  template: `
+  <form class="review-form" @submit.prevent="onSubmit">
+
+    <p v-if="errors.length">
+      <b>Please correct the following errors:</b>
+      <ul>
+        <li v-for="error in errors">{{ error }}</li>
+      </ul>
+
+    </p>
+    <p>
+      <label for="name">Name:</label>
+      <input id="name" v-model="name" placeholder="name">
+    </p>
+
+    <p>
+      <label for="review">Review:</label>
+      <textarea id="review" v-model="review"></textarea>
+    </p>
+
+    <p>
+      <label for="rating">Rating:</label>
+      <select id="rating" v-model.number="rating">
+        <option>5</option>
+        <option>4</option>
+        <option>3</option>
+        <option>2</option>
+        <option>1</option>
+      </select>
+    </p>
+
+    <div>
+      <p>Would you recommend this product?</p>
+      <input type="radio" value="yes" v-model="recommend">
+      <label for="yes"> Yes</label>
+      <input type="radio" value="no" v-model="recommend">
+      <label for="no"> No</label>
+    </div>
+
+    <p>
+      <input type="submit" value="Submit">
+    </p>
+
+  </form>
+  `,
+  data() {
+    return {
+      name: null,
+      review: null,
+      rating: null,
+      recommend: null,
+      errors: []
+    }
+  },
+  methods: {
+    onSubmit() {
+      if(this.name && this.review && this.rating && this.recommend){
+        let onSubmitObject = {
+          name: this.name,
+          review: this.review,
+          rating: this.rating,
+          recommend: this.recommend
+        }
+        this.$emit('review-submitted', onSubmitObject)
+        this.name = null
+        this.review = null
+        this.rating = null
+        this.recommend = null
+      } else {
+        if(!this.name) this.errors.push("Name required")
+        if(!this.review) this.errors.push("Review required")
+        if(!this.rating) this.errors.push("Rating required")
+        if(!this.recommend) this.errors.push("Reccomendation required")
+      }
+    }
+  }
 })
 
 Vue.component('product', {
@@ -60,6 +138,20 @@ Vue.component('product', {
               :class="{ disabledButton: !onSale }">Add to Cart</button>
 
       <div :class="{ lineThrough: !onSale}">Line-through</div>
+
+      <product-review @review-submitted="AddReview"></product-review>
+
+      <div>
+        <h2>Reviews</h2>
+        <p>There are no reviews yet.</p>
+        <ul>
+          <li v-for="review in reviews">
+            <p>{{ review.name }}</p>
+            <p>Rating: {{ review.rating }}</p>
+            <p>{{ review.review }}</p>
+          </li>
+        </ul>
+      </div>
     </div>
   `,
   data() {
@@ -82,7 +174,8 @@ Vue.component('product', {
           variantImage: "./assets/blue.jpeg",
           variantQuantity: 0
         }
-      ]
+      ],
+      reviews: []
     }
   },
   methods: {
@@ -95,6 +188,9 @@ Vue.component('product', {
     changeColor(index) {
       this.selectedVariant = index;
       console.log(index);
+    },
+    AddReview(reviewObj) {
+      this.reviews.push(reviewObj)
     }
   },
   computed: {
